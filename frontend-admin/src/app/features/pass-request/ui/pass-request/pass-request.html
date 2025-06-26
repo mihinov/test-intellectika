@@ -1,0 +1,63 @@
+<div class="pass-request-card">
+  <header>
+    <div class="pass-request-card__first-line">
+      <h2>Заявка на пропуск</h2>
+      <span class="status" [class]="passRequest.status">
+        {{ passRequest.status }}
+      </span>
+    </div>
+
+    @if (isEditingStatus) {
+      <form [formGroup]="form" class="status-edit">
+        <select class="select" name="status" formControlName="status">
+          @for (s of availableStatuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+        <div>
+          <button class="btn btn_error" type="button" (click)="cancelStatusChange()">Отменить</button>
+          <button class="btn" type="button" (click)="confirmStatusChange()">Подтвердить</button>
+        </div>
+      </form>
+    } @else {
+      <span
+        class="status-click-edit"
+        [class]="passRequest.status"
+        (click)="startStatusEdit()"
+        title="Кликните, чтобы изменить статус"
+      >
+        Изменить статус
+      </span>
+    }
+  </header>
+
+  <section class="user-info">
+    <strong>Пользователь:</strong>
+    <span>{{ passRequest.user.email }}</span>
+  </section>
+
+  <section class="visit-purpose">
+    <strong>Цель визита:</strong>
+    <span>{{ passRequest.visitPurpose }}</span>
+  </section>
+
+  <section class="history">
+    <h3 (click)="toggleStatusHistory()" style="cursor: pointer">
+      История статусов
+      <span>
+        {{ showStatusHistory() ? '▲' : '▼' }}
+      </span>
+    </h3>
+
+    @if (showStatusHistory()) {
+      <ul>
+        @for (item of passRequest.statusHistory; track item.changedAt) {
+          <li>
+            <span class="history-status">{{ item.status }}</span>
+            <span class="history-date">{{ item.changedAt | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

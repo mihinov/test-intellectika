@@ -1,0 +1,15 @@
+<header class="header">
+	<nav class="nav">
+		<a class="nav-item" [routerLink]="['/login']" routerLinkActive="nav-item_active">Вход</a>
+		<a class="nav-item" [routerLink]="['/registration']" routerLinkActive="nav-item_active">Регистрация</a>
+	</nav>
+</header>
+
+<main class="main">
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
+
+<footer class="footer"></footer>

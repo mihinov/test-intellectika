@@ -1,0 +1,16 @@
+<header class="header">
+  <div class="header__text">
+    @if (user$ | async; as user) {
+      {{ user.email }}
+    }
+  </div>
+  <button class="btn btn-logout" type="button" (click)="clickLogout()">Выйти</button>
+</header>
+
+<main>
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
+</main>
+
+<footer class="footer"></footer>

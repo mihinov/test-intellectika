@@ -1,0 +1,16 @@
+.header {
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+}
+
+.footer {
+  padding: 1.5rem;
+}
+
+.btn-logout {
+  cursor: pointer;
+}

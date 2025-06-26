@@ -1,0 +1,40 @@
+<div class="pass-request-card">
+  <header>
+    <div class="pass-request-card__first-line">
+      <h2>Заявка на пропуск</h2>
+      <span class="status" [class]="passRequest.status">
+        {{ passRequest.status }}
+      </span>
+    </div>
+  </header>
+
+  <section class="user-info">
+    <strong>Пользователь:</strong>
+    <span>{{ passRequest.user.email }}</span>
+  </section>
+
+  <section class="visit-purpose">
+    <strong>Цель визита:</strong>
+    <span>{{ passRequest.visitPurpose }}</span>
+  </section>
+
+  <section class="history">
+    <h3 (click)="toggleStatusHistory()" style="cursor: pointer">
+      История статусов
+      <span>
+        {{ showStatusHistory ? '▲' : '▼' }}
+      </span>
+    </h3>
+
+    @if (showStatusHistory) {
+      <ul>
+        @for (item of passRequest.statusHistory; track item.changedAt) {
+          <li>
+            <span class="history-status">{{ item.status }}</span>
+            <span class="history-date">{{ item.changedAt | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>

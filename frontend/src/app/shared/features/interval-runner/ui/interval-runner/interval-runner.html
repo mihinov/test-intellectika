@@ -1,0 +1,6 @@
+<div>
+  {{ text }}
+  @if (showElapsedTime) {
+    <span>{{ remainingSeconds() | number: '1.0-0' }}</span> сек
+  }
+</div>

@@ -1,0 +1,23 @@
+<div class="create-pass-request-card">
+  <h2>Создание заявки на пропуск</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="visitPurpose">Цель визита</label>
+      <input
+        id="visitPurpose"
+        formControlName="visitPurpose"
+        type="text"
+        placeholder="Покакать в библиотеке"
+        required
+      />
+      <div [class]="{'error-visible': hasError()}" class="error">
+        Цель визита обязательна
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="form.invalid">Создать заявку</button>
+    </div>
+  </form>
+</div>

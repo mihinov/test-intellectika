@@ -1,0 +1,7 @@
+<div class="pass-request-list">
+  @if (passRequests$ | async; as passRequests) {
+    @for (passRequest of passRequests; track passRequest._id) {
+      <pass-request [passRequest]="passRequest"></pass-request>
+    }
+  }
+</div>

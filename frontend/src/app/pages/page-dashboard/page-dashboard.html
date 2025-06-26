@@ -1,0 +1,12 @@
+@if (passRequests$ | async; as passRequest) {
+	<pass-request [passRequest]="passRequest"></pass-request>
+	<p>
+		<interval-runner
+			(intervalTick)="intervalFn()"
+			[intervalMs]="10_000"
+			[text]="'Обновление статуса заявки через'"
+		></interval-runner>
+	</p>
+} @else {
+	<create-pass-request></create-pass-request>
+}
