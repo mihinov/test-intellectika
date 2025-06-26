@@ -1,7 +1,10 @@
 Версия node.js на котором запускался проект описана в файле `.nvmrc`
 
 # Как запускать
-1. Создать .env файл в папке backend:
+
+1. Запустить `npm install`
+
+2. Создать .env файл в папке backend:
 
 	```
 	MONGODB_USER_NAME=admin
@@ -14,8 +17,6 @@
 	PORT=4336
 	JWT_SECRET=secret-hello
 	```
-
-2. Запустить `npm install`
 
 3. Перейти в папку `backend` и запустить
 
