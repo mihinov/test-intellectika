@@ -3,7 +3,7 @@
 # Как запускать
 
 1. Запустить `npm run create-env`
-2. Запустить приложение Docker Desktop и запустить `npm run docker`
+2. Запустить приложение [Docker Desktop](https://www.docker.com/products/docker-desktop/) и запустить `npm run docker`
 
 	Дождаться, когда запустится контейнер и все образы
 
