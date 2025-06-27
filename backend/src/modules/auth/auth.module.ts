@@ -19,6 +19,7 @@ import { getJWTconfig } from 'src/config/jwt.config';
 		})
 	],
 	providers: [AuthService, JwtStrategy],
-	controllers: [AuthController]
+	controllers: [AuthController],
+	exports: [AuthService]
 })
 export class AuthModule {}

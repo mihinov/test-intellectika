@@ -56,6 +56,23 @@ export class AuthService {
 		return createdUser;
 	}
 
+	public async registerEmailPasswordAdmin(authRegisterEmailPasswordDto: AuthRegisterEmailPasswordDto): Promise<User> {
+		const foundedUser: User | null = await this._userService.getUserByEmail(authRegisterEmailPasswordDto.email);
+
+		if (foundedUser !== null) {
+			throw new UnauthorizedException(`Пользователь email: ${authRegisterEmailPasswordDto.email} уже зарегистрирован`);
+		}
+
+		const salt: string = bcrypt.genSaltSync(10);
+
+		const createdUser: User = await this._userService.createUserAdmin({
+			...authRegisterEmailPasswordDto,
+			password: bcrypt.hashSync(authRegisterEmailPasswordDto.password, salt)
+		});
+
+		return createdUser;
+	}
+
 	private async _validateUserEmailPassword({ email, password }: AuthLoginEmailPasswordDto): Promise<User> {
 		const foundedUser: User | null = await this._userService.getUserByEmail(email);
 
