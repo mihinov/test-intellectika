@@ -4,7 +4,7 @@
 
 1. Запустить `npm install`
 2. Запустить `npm run create-env`
-3. Запустить `npm run docker`
+3. Запустить приложения Docker Desktop и запустить `npm run docker`
 
 	Дождаться, когда запустится контейнер, там запускается база данных MongoDb
 
