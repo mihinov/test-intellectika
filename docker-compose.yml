@@ -1,0 +1,48 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo_container
+    ports:
+      - "${MONGODB_PORT}:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER_NAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_USER_PASSWORD}
+
+  backend:
+    build: ./backend
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    environment:
+      MONGODB_HOST: mongo
+      MONGODB_PORT: 27017
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    environment:
+      PORT: ${FRONTEND_PORT}
+
+  frontend-admin:
+    build: ./frontend-admin
+    ports:
+      - "${FRONTEND_ADMIN_PORT}:${FRONTEND_ADMIN_PORT}"
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    environment:
+      PORT: ${FRONTEND_ADMIN_PORT}
+
+volumes:
+  mongo-data:
