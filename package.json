@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "install": "cd backend && npm i && cd ../frontend && npm i && cd ../frontend-admin && npm i",
-		"start": "concurrently \"cd backend && npm run start:dev\" \"cd frontend && npm run start\" \"cd frontend-admin && npm run start\""
+		"start": "concurrently \"cd backend && npm run start:dev\" \"cd frontend && npm run start\" \"cd frontend-admin && npm run start\"",
+		"docker": "cd backend && docker-compose up -d",
+		"create-env": "node ./utils/create-env.js"
   },
   "author": "",
   "license": "ISC",
