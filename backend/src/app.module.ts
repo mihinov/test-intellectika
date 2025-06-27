@@ -7,6 +7,7 @@ import { getMongoConnectionString } from './config/mongodb.config';
 import { JoiPipeModule } from 'nestjs-joi';
 import { getConfigJoi } from './config/joi.config';
 import { PassRequestsModule } from './modules/pass-requests/pass-requests.module';
+import { BootstrapService } from './shared/services/bootstrap.service';
 
 const featureModules = [
   AuthModule,
@@ -35,5 +36,6 @@ const featureModules = [
 		PassRequestsModule,
 	],
 	controllers: [],
+	providers: [BootstrapService],
 })
 export class AppModule {}

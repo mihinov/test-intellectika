@@ -24,6 +24,19 @@ export class UserService {
 		}
 	}
 
+	async createUserAdmin(createUserDto: CreateUserDto): Promise<User> {
+		try {
+			const newUser = new this._userModel({
+				...createUserDto,
+				role: 'admin'
+			});
+
+			return await newUser.save();
+		} catch (error) {
+			throw new BadRequestException(error.message);
+		}
+	}
+
 	async getUserByEmail(email: string): Promise<User | null> {
 		const user: User | null = await this._userModel.findOne({ email });
 
