@@ -5,7 +5,8 @@
   "scripts": {
     "install": "cd backend && npm i && cd ../frontend && npm i && cd ../frontend-admin && npm i",
 		"start": "concurrently \"cd backend && npm run start:dev\" \"cd frontend && npm run start\" \"cd frontend-admin && npm run start\"",
-		"docker": "docker-compose up --build -d",
+		"docker": "docker-compose -f docker-compose.yml up --build -d",
+		"docker:db": "docker-compose -f docker-compose.mongo.yml up --build -d",
 		"create-env": "node ./utils/create-env.js"
   },
   "author": "",
