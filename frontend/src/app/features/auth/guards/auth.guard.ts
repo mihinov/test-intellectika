@@ -15,7 +15,7 @@ export function authGuard(): Observable<boolean> {
     map(() => true),              // если пришло, разрешаем
     catchError(() => {
       // Если таймаут или ошибка — редирект и запрещаем переход
-      router.navigate(['/login']);
+      router.navigate(['/auth']);
       return of(false);
     })
   );

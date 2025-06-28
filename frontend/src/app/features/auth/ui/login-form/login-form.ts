@@ -40,7 +40,7 @@ export class LoginForm {
     this._authService.login(credentials).pipe(
       takeUntilDestroyed(this._destroyRef)
     ).subscribe(() => {
-      this._router.navigateByUrl('/dashboard')
+      this._router.navigateByUrl('/account/dashboard')
     });
   }
 

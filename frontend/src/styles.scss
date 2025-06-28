@@ -64,3 +64,37 @@ body {
 }
 
 // TOAST
+
+.nav-item {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--ui-text);
+  background-color: transparent;
+  transition: background-color 0.2s, border-color 0.2s;
+	position: relative;
+	--nav-item-border-color: transparent;
+}
+
+.nav-item::before {
+	display: block;
+	content: '';
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-bottom: 2px solid var(--nav-item-border-color);
+	transition: border-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: var(--ui-hover-bg);
+  border-color: var(--ui-border);
+  cursor: pointer;
+}
+
+.nav-item_active::before {
+	--nav-item-border-color: var(--ui-text);
+}

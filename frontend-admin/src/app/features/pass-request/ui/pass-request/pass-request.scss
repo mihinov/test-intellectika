@@ -98,15 +98,11 @@ section {
   }
 }
 
-.user-info, .visit-purpose {
+.user-list-info__item {
   display: flex;
   gap: 1rem;
   justify-content: space-between;
   flex-wrap: wrap;
-}
-
-.visit-purpose  {
-  margin-bottom: 1.5rem;
 }
 
 .status-edit {

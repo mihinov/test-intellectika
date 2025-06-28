@@ -1,0 +1,10 @@
+@if (authUser$ | async; as authUser) {
+  <div class="user-card">
+    <div class="user-info">
+      <p><strong>Email:</strong> {{ authUser.email }}</p>
+      <p><strong>Организация:</strong> {{ authUser.organization }}</p>
+      <p><strong>Телефон:</strong> {{ authUser.phone }}</p>
+      <p><strong>Роль:</strong> {{ authUser.role }}</p>
+    </div>
+  </div>
+}

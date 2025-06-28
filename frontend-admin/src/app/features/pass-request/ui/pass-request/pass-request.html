@@ -31,15 +31,32 @@
     }
   </header>
 
-  <section class="user-info">
-    <strong>Пользователь:</strong>
-    <span>{{ passRequest.user.email }}</span>
-  </section>
+	<div class="user-list-info">
+		  <section class="user-list-info__item">
+				<strong>Email:</strong>
+				<span>{{ passRequest.user.email }}</span>
+			</section>
 
-  <section class="visit-purpose">
-    <strong>Цель визита:</strong>
-    <span>{{ passRequest.visitPurpose }}</span>
-  </section>
+			<section class="user-list-info__item">
+				<strong>Организация:</strong>
+				<span>{{ passRequest.user.organization }}</span>
+			</section>
+
+			<section class="user-list-info__item">
+				<strong>Телефон:</strong>
+				<span>{{ passRequest.user.phone }}</span>
+			</section>
+
+			<section class="user-list-info__item">
+				<strong>Роль:</strong>
+				<span>{{ passRequest.user.role }}</span>
+			</section>
+
+			<section class="user-list-info__item">
+				<strong>Цель визита:</strong>
+				<span>{{ passRequest.visitPurpose }}</span>
+			</section>
+	</div>
 
   <section class="history">
     <h3 (click)="toggleStatusHistory()" style="cursor: pointer">

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "install": "cd backend && npm i && cd ../frontend && npm i && cd ../frontend-admin && npm i",
+    "install": "npm ci && cd backend && npm ci && cd ../frontend && npm ci && cd ../frontend-admin && npm ci",
 		"start": "concurrently \"cd backend && npm run start:dev\" \"cd frontend && npm run start\" \"cd frontend-admin && npm run start\"",
 		"docker": "docker-compose -f docker-compose.yml up --build -d",
 		"docker:db": "docker-compose -f docker-compose.mongo.yml up --build -d",

@@ -1,0 +1,24 @@
+<header class="header">
+	<div class="container">
+		<div class="header__wrapper">
+			<nav class="header__nav">
+				<a routerLink="/account" class="header__nav-link nav-item" routerLinkActive="nav-item_active" [routerLinkActiveOptions]="{ exact: true }">Аккаунт</a>
+				<a routerLink="/account/dashboard" class="header__nav-link nav-item" routerLinkActive="nav-item_active">Заявка</a>
+			</nav>
+			<div class="header__text">
+				@if (user$ | async; as user) {
+				{{ user.email }}
+				}
+			</div>
+			<button class="btn btn-logout" type="button" (click)="clickLogout()">Выйти</button>
+		</div> <!-- .header__wrapper -->
+	</div> <!-- .container -->
+</header>
+
+<main>
+	<div class="container">
+		<router-outlet></router-outlet>
+	</div>
+</main>
+
+<footer class="footer"></footer>
