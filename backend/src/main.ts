@@ -25,6 +25,7 @@ async function bootstrap() {
 		// .addTag('cats')
 		.addTag('auth', 'Аутентификация пользователя')
 		.addTag('pass-requests', 'Получение и отслеживание статуса пропуска')
+		.addTag('pass-statuses', 'Типы статусов пропуска')
 		.addBearerAuth()
 		.build();
 
