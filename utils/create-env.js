@@ -24,7 +24,9 @@ FRONTEND_ADMIN_PORT=4600
 // Пути к файлам .env
 const paths = [
   path.join(__dirname, '..', '.env'),
-  path.join(__dirname, '..', 'backend', '.env')
+  path.join(__dirname, '..', 'backend', '.env'),
+  path.join(__dirname, '..', 'frontend', '.env'),
+	path.join(__dirname, '..', 'frontend-admin', '.env')
 ];
 
 // Создаём файлы
