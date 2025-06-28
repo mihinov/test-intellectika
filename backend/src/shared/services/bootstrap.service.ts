@@ -1,16 +1,23 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AuthService } from 'src/modules/auth/auth.service';
+import { PassStatusesService } from 'src/modules/pass-statuses/pass-statuses.service';
 import { UserService } from 'src/modules/user/user.service';
 
 @Injectable()
 export class BootstrapService implements OnModuleInit {
 	constructor(
 		private readonly _usersService: UserService,
-		private readonly _authService: AuthService
+		private readonly _authService: AuthService,
+		private readonly _passStatusesService: PassStatusesService
 
 	) {}
 
 	async onModuleInit() {
+		await this._createAdminUser();
+		await this._createDefaultPassStatuses();
+  }
+
+	private async _createAdminUser(): Promise<void> {
 		const userInfo = {
 			email: 'kamahinmihail@gmail.com',
 			password: '123',
@@ -23,7 +30,16 @@ export class BootstrapService implements OnModuleInit {
       await this._authService.registerEmailPasswordAdmin(userInfo);
       console.log('✅ Начальный пользователь создан');
     } else {
-      console.log('ℹ️ Начальный пользователь уже существует');
+      //console.log('ℹ️ Начальный пользователь уже существует');
     }
-  }
+	}
+
+	private async _createDefaultPassStatuses(): Promise<void> {
+		const statusesInDb = await this._passStatusesService.getAllByTypeAndValue(PassStatusesService.DEFAULT_STATUSES);
+
+		if (statusesInDb.length !== PassStatusesService.DEFAULT_STATUSES.length && statusesInDb.length === 0) {
+			await this._passStatusesService.createInitStatuses();
+			console.log('✅ Начальные статусы созданы');
+		}
+	}
 }

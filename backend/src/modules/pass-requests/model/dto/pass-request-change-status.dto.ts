@@ -1,7 +1,7 @@
 import { JoiSchema, JoiSchemaOptions } from "nestjs-joi";
 import { ApiProperty } from "@nestjs/swagger";
 import * as Joi from 'joi';
-import { PassRequestStatus } from "../enum/pass-request-status.enum";
+import { PassRequestStatusEnum } from "../enum/pass-request-status.enum";
 
 @JoiSchemaOptions({})
 export class PassRequestChangeStatusDto {
@@ -9,8 +9,8 @@ export class PassRequestChangeStatusDto {
 		description: 'Статус заявки',
 		required: true,
 		type: String,
-		example: PassRequestStatus.Issued,
+		example: PassRequestStatusEnum.Issued,
 	})
-	@JoiSchema(Joi.string().valid(...Object.values(PassRequestStatus)).required())
-	status!: PassRequestStatus;
+	@JoiSchema(Joi.string().valid(...Object.values(PassRequestStatusEnum)).required())
+	status!: PassRequestStatusEnum;
 }

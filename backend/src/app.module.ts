@@ -8,6 +8,7 @@ import { JoiPipeModule } from 'nestjs-joi';
 import { getConfigJoi } from './config/joi.config';
 import { PassRequestsModule } from './modules/pass-requests/pass-requests.module';
 import { BootstrapService } from './shared/services/bootstrap.service';
+import { PassStatusesModule } from './modules/pass-statuses/pass-statuses.module';
 
 const featureModules = [
   AuthModule,
@@ -34,6 +35,7 @@ const featureModules = [
 			}
 		}),
 		PassRequestsModule,
+		PassStatusesModule,
 	],
 	controllers: [],
 	providers: [BootstrapService],

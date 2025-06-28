@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PassRequests, PassRequestsDocument } from './pass-requests.schema';
 import { Model } from 'mongoose';
@@ -6,73 +6,114 @@ import { AddField } from 'src/shared/utils/add-field';
 import { User } from '../user/user.schema';
 import { PassRequestCreateDto } from './model/dto/pass-request-create.dto';
 import { RequestUserDto } from '../auth/dto/request-user.dto';
-import { PassRequestStatus } from './model/enum/pass-request-status.enum';
+import { PassRequestStatusEnum } from './model/enum/pass-request-status.enum';
 import { PassRequestChangeStatusDto } from './model/dto/pass-request-change-status.dto';
+import { PassStatusDocument } from '../pass-statuses/pass-statuses.schema';
+import { PassStatusesService } from '../pass-statuses/pass-statuses.service';
 
 @Injectable()
 export class PassRequestsService {
-	constructor(
-		@InjectModel(PassRequests.name) private readonly _passRequestsModel: Model<PassRequestsDocument>
-	) { }
+  constructor(
+    @InjectModel(PassRequests.name) private readonly _passRequestsModel: Model<PassRequestsDocument>,
+		private readonly _passStatusesService: PassStatusesService
+  ) {}
 
-	async getById(req: RequestUserDto) {
-		const user = req.user as AddField<User, '_id', string>;
+  async getById(req: RequestUserDto) {
+    const user = req.user as AddField<User, '_id', string>;
 
-		return this._passRequestsModel
-			.findOne({ user: user._id })
+    return this._passRequestsModel
+      .findOne({ user: user._id })
+      .populate({
+        path: 'user',
+        select: '-password -__v -createdAt -updatedAt -_id',
+      })
 			.populate({
-				path: 'user',
-				select: '-password -__v -createdAt -updatedAt -_id', // убираем лишнее
+				path: 'status',
+				select: '-__v -createdAt -updatedAt',
+			})
+			.populate({
+				path: 'statusHistory.status',
+				select: '-__v -createdAt -updatedAt',
+			})
+			.exec();
+  }
+
+	async create(
+		passRequestCreateDto: PassRequestCreateDto,
+		req: RequestUserDto
+	): Promise<PassRequests> {
+		try {
+			const user = req.user as AddField<User, '_id', string>;
+
+			// Проверяем, есть ли уже заявка от этого пользователя
+			const existingRequest = await this._passRequestsModel.findOne({ user: user._id });
+			if (existingRequest) {
+				throw new ConflictException('Вы уже подали заявку. Нельзя создать повторно.');
+			}
+
+			// Получаем статус из коллекции PassStatus по enum-значению
+			const initialStatusDoc = await this._passStatusesService.getStatusByType(PassRequestStatusEnum.InProgress);
+			if (!initialStatusDoc) {
+				throw new NotFoundException('Статус "В процессе" не найден в базе.');
+			}
+
+			// Создаем заявку с полями
+			const newPassRequest = new this._passRequestsModel({
+				visitPurpose: passRequestCreateDto.visitPurpose,
+				user: user._id,
+				status: initialStatusDoc._id,
+				statusHistory: [
+					{
+						status: initialStatusDoc._id,
+						changedAt: new Date(),
+					},
+				],
 			});
-	}
 
-	async create(passRequestCreateDto: PassRequestCreateDto, req: RequestUserDto): Promise<PassRequests> {
-		const user = req.user as AddField<User, '_id', string>;
-
-		// 1. Проверка: есть ли уже заявка от этого пользователя?
-		const existingRequest = await this._passRequestsModel.findOne({ user: user._id });
-
-		if (existingRequest) {
-			throw new ConflictException('Вы уже подали заявку. Нельзя создать повторно.');
+			return await newPassRequest.save();
+		} catch (error) {
+			throw new BadRequestException(error.message);
 		}
-
-		// 2. Создание новой заявки
-		return this._passRequestsModel.create({
-			visitPurpose: passRequestCreateDto.visitPurpose,
-			user: user._id,
-			status: PassRequestStatus.InProgress,
-			statusHistory: [
-				{
-					status: PassRequestStatus.InProgress,
-					changedAt: new Date(),
-				},
-			],
-		});
 	}
 
-	async changeStatus(passRequestId: string, { status }: PassRequestChangeStatusDto, req: RequestUserDto) {
+	async changeStatus(
+		passRequestId: string,
+		{ status }: PassRequestChangeStatusDto,
+		req: RequestUserDto
+	) {
 		const user = req.user as AddField<User, '_id', string>;
 
-		const isAdmin = user.role === 'admin';
-
-		if (!isAdmin) {
+		if (user.role !== 'admin') {
 			throw new ForbiddenException('Нет прав на изменение статуса');
 		}
 
-		const passRequest = await this._passRequestsModel.findById(passRequestId);
+		const passRequest = await this._passRequestsModel
+			.findById(passRequestId)
+			.populate<{ status: PassStatusDocument }>('status'); // правильная типизация после populate
 
 		if (!passRequest) {
-			throw new ConflictException('Заявка не найдена.');
+			throw new ConflictException('Заявка не найдена.');
 		}
 
-		const currentStatus = passRequest.status;
-		if (currentStatus === status) {
-			throw new BadRequestException(`Статус уже установлен как "${currentStatus}"`);
+		const validStatuses = Object.values(PassRequestStatusEnum);
+		if (!validStatuses.includes(status)) {
+			throw new BadRequestException(
+				`Недопустимый статус: "${status}". Разрешённые значения: ${validStatuses.join(', ')}`
+			);
 		}
 
-		passRequest.status = status;
+		if (passRequest.status.type === String(status)) {
+			throw new BadRequestException(`Статус уже установлен как "${status}"`);
+		}
+
+		const newStatusDoc = await this._passStatusesService.getStatusByType(status);
+		if (!newStatusDoc) {
+			throw new ConflictException(`Статус с типом "${status}" не найден в базе.`);
+		}
+
+		passRequest.status = newStatusDoc;
 		passRequest.statusHistory.push({
-			status: status,
+			status: newStatusDoc._id,
 			changedAt: new Date(),
 		});
 
@@ -82,10 +123,19 @@ export class PassRequestsService {
 	}
 
 	async getAll(): Promise<PassRequests[]> {
-		return this._passRequestsModel.find()
+		return this._passRequestsModel
+			.find()
 			.populate({
 				path: 'user',
-				select: '-password -__v -createdAt -updatedAt -_id', // убираем лишнее
+				select: '-password -__v -createdAt -updatedAt -_id',
+			})
+			.populate({
+				path: 'status',
+				select: '-__v -createdAt -updatedAt',
+			})
+			.populate({
+				path: 'statusHistory.status',
+				select: '-__v -createdAt -updatedAt',
 			})
 			.exec();
 	}

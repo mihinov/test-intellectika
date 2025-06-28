@@ -2,8 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 import { PlainMongoObject } from "src/shared/utils/lean-document";
 import { User } from "../user/user.schema";
-import { PassRequestStatus } from "./model/enum/pass-request-status.enum";
-import { PassRequestStatusHistory } from "./model/interfaces/pass-request-status-history.interface";
+import { PassStatus } from "../pass-statuses/pass-statuses.schema";
 
 @Schema({ timestamps: true, collection: 'pass-requests' })
 export class PassRequests {
@@ -14,19 +13,17 @@ export class PassRequests {
 	@Prop({ required: true })
   visitPurpose: string;
 
-	@Prop({ enum: PassRequestStatus, default: PassRequestStatus.InProgress })
-  status: PassRequestStatus;
+  @Prop({ type: Types.ObjectId, ref: PassStatus.name, required: true })
+  status: Types.ObjectId;
 
-	@Prop({
-    type: [
-      {
-        status: { type: String, enum: PassRequestStatus },
-        changedAt: { type: Date, default: Date.now },
-      },
-    ],
+  @Prop({
+    type: [{
+      status: { type: Types.ObjectId, ref: PassStatus.name, required: true },
+      changedAt: { type: Date, required: true },
+    }],
     default: [],
   })
-  statusHistory: PassRequestStatusHistory[]
+  statusHistory: { status: Types.ObjectId; changedAt: Date }[];
 }
 
 export type PassRequestsDocument = HydratedDocument<PassRequests>;

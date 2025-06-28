@@ -46,7 +46,7 @@ export class RegistrationForm {
       takeUntilDestroyed(this._destroyRef),
 			take(1)
     ).subscribe(() => {
-      this._router.navigateByUrl('/dashboard');
+      this._router.navigateByUrl('/account/dashboard');
     });
   }
 

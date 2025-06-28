@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthService } from '../../features/auth/services/auth.service';
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-page-account',
   imports: [
-		AsyncPipe,
-		JsonPipe
+		AsyncPipe
 	],
   templateUrl: './page-account.html',
   styleUrl: './page-account.scss',
