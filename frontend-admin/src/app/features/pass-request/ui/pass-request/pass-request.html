@@ -9,7 +9,7 @@
 
     @if (isEditingStatus) {
       <form [formGroup]="form" class="status-edit">
-        <select class="select" name="status" formControlName="status">
+        <select class="select" formControlName="status">
           @for (s of availableStatuses; track s) {
             <option [value]="s">{{ s }}</option>
           }

@@ -1,36 +1,64 @@
 <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
 
-  <div>
-    <label for="email">Email</label>
-    <input id="email" type="email" [formControl]="registrationForm.controls.email" autocomplete="email" />
-    <div class="error-message" [class.visible]="hasError('email')">
-      Введите корректный email
-    </div>
+<div>
+  <label>
+    Email
+    <input
+      type="email"
+      name="email"
+      [formControl]="registrationForm.controls.email"
+      autocomplete="email"
+    />
+  </label>
+  <div class="error-message" [class.visible]="hasError('email')">
+    Введите корректный email
   </div>
+</div>
 
-  <div>
-    <label for="password">Пароль</label>
-    <input id="password" type="password" [formControl]="registrationForm.controls.password" autocomplete="current-password" />
-    <div class="error-message" [class.visible]="hasError('password')">
-      Пароль обязателен
-    </div>
+<div>
+  <label>
+    Пароль
+    <input
+      type="password"
+      name="password"
+      [formControl]="registrationForm.controls.password"
+      autocomplete="new-password"
+    />
+  </label>
+  <div class="error-message" [class.visible]="hasError('password')">
+    Пароль обязателен
   </div>
+</div>
+
+<div>
+  <label>
+    Телефон
+    <input
+      type="text"
+      name="phone"
+      [formControl]="registrationForm.controls.phone"
+      autocomplete="tel"
+    />
+  </label>
+  <div class="error-message" [class.visible]="hasError('phone')">
+    Телефон обязателен
+  </div>
+</div>
 
 	<div>
-    <label for="organization">Организация</label>
-    <input id="organization" type="text" [formControl]="registrationForm.controls.organization"/>
-    <div class="error-message" [class.visible]="hasError('organization')">
-      Организация обязательна
-    </div>
-  </div>
-
-	<div>
-    <label for="phone">Телефон</label>
-    <input id="phone" type="text" [formControl]="registrationForm.controls.phone"/>
-    <div class="error-message" [class.visible]="hasError('phone')">
-      Телефон обязателен
-    </div>
-  </div>
+		<label>
+			Организация
+			<input
+				type="text"
+				name="organization"
+				[formControl]="registrationForm.controls.organization"
+				autocomplete="organization"
+			/>
+		</label>
+		<div class="error-message" [class.visible]="hasError('organization')">
+			Организация обязательна
+		</div>
+	</div>
 
   <button type="submit" [disabled]="registrationForm.invalid">Войти</button>
 
