@@ -38,8 +38,10 @@ export interface PassRequest {
 }
 
 export interface PassRequestStatusHistory {
-	type: PassRequestStatusEnum;
-	value: PassRequestStatusValueEnum;
+	status: {
+		type: PassRequestStatusEnum;
+		value: PassRequestStatusValueEnum;
+	};
 	changedAt: Date;
 }
 

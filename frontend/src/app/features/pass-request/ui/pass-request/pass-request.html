@@ -3,7 +3,7 @@
     <div class="pass-request-card__first-line">
       <h2>Заявка на пропуск</h2>
       <span class="status" [class]="passRequest.status.type">
-        {{ passRequest.status.type }}
+        {{ passRequest.status.value }}
       </span>
     </div>
   </header>
@@ -30,7 +30,7 @@
       <ul>
         @for (item of passRequest.statusHistory; track item.changedAt) {
           <li>
-            <span class="history-status">{{ item.value }}</span>
+            <span class="history-status">{{ item.status.value }}</span>
             <span class="history-date">{{ item.changedAt | date: 'dd.MM.yyyy HH:mm:ss' }}</span>
           </li>
         }
