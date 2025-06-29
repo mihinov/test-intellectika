@@ -28,6 +28,6 @@ async function checkReplicaSetConnection(uri) {
   }
 }
 
-const uri = "mongodb://admin:password@127.0.0.1:29017/intellectika-4?authSource=admin&replicaSet=rs0";
+const uri = "mongodb://admin:password@127.0.0.1:29017/intellectika-5?authSource=admin&replicaSet=rs0";
 
 checkReplicaSetConnection(uri);
