@@ -2,21 +2,15 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AuthService } from 'src/modules/auth/auth.service';
 import { PassStatusesService } from 'src/modules/pass-statuses/pass-statuses.service';
 import { UserService } from 'src/modules/user/user.service';
-import { MongoClient } from 'mongodb';
-import { ConfigService } from '@nestjs/config';
-import { getMongoConnectionString } from 'src/config/mongodb.config';
 
 @Injectable()
 export class BootstrapService implements OnModuleInit {
-  private readonly _mongoUri: string;
-
   constructor(
-    private readonly _configService: ConfigService,
     private readonly _usersService: UserService,
     private readonly _authService: AuthService,
     private readonly _passStatusesService: PassStatusesService,
   ) {
-    this._mongoUri = getMongoConnectionString(this._configService);
+
   }
 
   async onModuleInit() {
