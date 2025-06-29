@@ -4,8 +4,6 @@ services:
     container_name: mongo_container
     ports:
       - "${MONGODB_PORT}:27017"
-    volumes:
-      - mongo-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER_NAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_USER_PASSWORD}

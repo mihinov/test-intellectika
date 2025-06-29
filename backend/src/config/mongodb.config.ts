@@ -7,12 +7,13 @@ export const getMongoConnectionString = (
 	const username = configService.get<string>('MONGODB_USER_NAME');
 	const password = configService.get<string>('MONGODB_USER_PASSWORD');
 	const host = configService.get<string>('MONGODB_HOST');
-	const port = configService.get<number>('MONGODB_PORT');
-	const projectName = configService.get<number>('PROJECT_NAME');
-	const databaseName = configService.get<number>('MONGODB_DATABASE_NAME');
-	const databaseAuthName = configService.get<number>(
+	const port = process.env.IS_DOCKER === 'true' ? 27017 : Number(configService.get<string>('MONGODB_PORT'));
+	const projectName = configService.get<string>('PROJECT_NAME');
+	const databaseName = configService.get<string>('MONGODB_DATABASE_NAME');
+	const databaseAuthName = configService.get<string>(
 		'MONGODB_DATABASE_AUTH_NAME'
 	);
+	const replicaSet = configService.get<string>('MONGODB_REPLICA_SET');
 
 	// Проверка, что все обязательные параметры присутствуют
 	if (
@@ -22,7 +23,8 @@ export const getMongoConnectionString = (
 		!port ||
 		!databaseName ||
 		!databaseAuthName ||
-		!projectName
+		!projectName ||
+		!replicaSet
 	) {
 		throw new Error(
 			'Отсутствуют параметры конфигурации для подключения к MongoDB'
@@ -36,5 +38,8 @@ export const getMongoConnectionString = (
 	// Формируем и возвращаем строку подключения к MongoDB
 	const uri = `mongodb://${encodedUsername}:${encodedPassword}@${host}:${port}/${databaseName}?authSource=${databaseAuthName}`;
 
+	console.log(uri)
+
 	return uri;
 };
+

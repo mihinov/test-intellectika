@@ -3,12 +3,12 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UserModule } from './modules/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { getMongoConnectionString } from './config/mongodb.config';
 import { JoiPipeModule } from 'nestjs-joi';
 import { getConfigJoi } from './config/joi.config';
 import { PassRequestsModule } from './modules/pass-requests/pass-requests.module';
 import { BootstrapService } from './shared/services/bootstrap.service';
 import { PassStatusesModule } from './modules/pass-statuses/pass-statuses.module';
+import { getMongoConnectionString } from './config/mongodb.config';
 
 const featureModules = [
   AuthModule,
