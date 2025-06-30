@@ -6,9 +6,16 @@ services:
       - "${MONGODB_PORT}:27017"
     volumes:
       - mongo-data:/data/db
+      - ./backend/docker-entrypoint.sh:/docker-entrypoint.sh:ro
+    entrypoint: ["/docker-entrypoint.sh"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER_NAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_USER_PASSWORD}
+      MONGODB_HOST: ${MONGODB_HOST}
+      MONGODB_PORT: ${MONGODB_PORT}
+      MONGODB_REPLICA_SET: ${MONGODB_REPLICA_SET}
+      MONGODB_DATABASE_AUTH_NAME: ${MONGODB_DATABASE_AUTH_NAME}
+      MONGODB_REPLICA_SET_HOST: ${MONGODB_REPLICA_SET_HOST}
 
   backend:
     build: ./backend

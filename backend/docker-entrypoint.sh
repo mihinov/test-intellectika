@@ -40,14 +40,22 @@ while ! mongosh --host "127.0.0.1" --port "${MONGODB_PORT}" --eval "db.adminComm
 done
 echo "✅ mongod init поднялся"
 
-echo "🔍 Проверяем состояние replica set и инициализируем с правильным host..."
+echo "🔍 Проверяем состояние replica set и инициализируем с правильными host'ами..."
 RS_INIT_CHECK=$(mongosh --host "127.0.0.1" --port "${MONGODB_PORT}" --quiet --eval "try { rs.status().ok } catch(e) { 0 }")
+
 if [ "$RS_INIT_CHECK" != "1" ]; then
-  echo "🧱 Инициализируем replica set с host=${MONGODB_REPLICA_SET_HOST}:${MONGODB_PORT}..."
-  mongosh --host "127.0.0.1" --port "${MONGODB_PORT}" --eval "rs.initiate({_id:'${MONGODB_REPLICA_SET}', members:[{_id:0, host:'${MONGODB_REPLICA_SET_HOST}:${MONGODB_PORT}'}]});"
-  echo "✅ replica set инициализирован"
+  echo "🧱 Инициализируем replica set с host'ом: ${MONGODB_REPLICA_SET_HOST}:${MONGODB_PORT}..."
+  mongosh --host "127.0.0.1" --port "${MONGODB_PORT}" --eval "
+		rs.initiate({
+			_id: '${MONGODB_REPLICA_SET}',
+			members: [
+				{ _id: 0, host: '${MONGODB_REPLICA_SET_HOST}:${MONGODB_PORT}' }
+			]
+		});
+  "
+  echo "✅ Replica set инициализирован"
 else
-  echo "ℹ️ replica set уже инициализирован"
+  echo "ℹ️ Replica set уже инициализирован"
 fi
 
 echo "⏳ Ждем, пока node станет PRIMARY..."

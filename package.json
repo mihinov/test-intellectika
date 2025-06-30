@@ -10,7 +10,6 @@
 		"start": "concurrently \"npm run start:backend\" \"npm run start:frontend\" \"npm run start:frontend-admin\"",
 		"docker": "docker-compose -f docker-compose.yml up --build -d",
 		"docker:db": "docker-compose -f docker-compose.mongo.yml up --build -d",
-		"docker:db-replica-set": "docker-compose -f docker-compose.mongo.replica-set.yml up --build -d",
 		"create-env": "node ./utils/create-env.js"
   },
   "author": "",

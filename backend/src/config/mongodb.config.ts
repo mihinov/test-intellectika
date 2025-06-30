@@ -36,7 +36,7 @@ export const getMongoConnectionString = (
 	const encodedPassword = encodeURIComponent(password);
 
 	// Формируем и возвращаем строку подключения к MongoDB
-	const uri = `mongodb://${encodedUsername}:${encodedPassword}@${host}:${port}/${databaseName}?authSource=${databaseAuthName}`;
+	const uri = `mongodb://${encodedUsername}:${encodedPassword}@${host}:${port}/${databaseName}?authSource=${databaseAuthName}&replicaSet=${replicaSet}&readPreference=primary`;
 
 	console.log(uri)
 
