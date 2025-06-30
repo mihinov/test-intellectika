@@ -27,7 +27,6 @@ services:
       - .env
     environment:
       MONGODB_HOST: mongo
-      MONGODB_PORT: 27017
 
   frontend:
     build: ./frontend

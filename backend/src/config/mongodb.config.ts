@@ -7,7 +7,7 @@ export const getMongoConnectionString = (
 	const username = configService.get<string>('MONGODB_USER_NAME');
 	const password = configService.get<string>('MONGODB_USER_PASSWORD');
 	const host = configService.get<string>('MONGODB_HOST');
-	const port = process.env.IS_DOCKER === 'true' ? 27017 : Number(configService.get<string>('MONGODB_PORT'));
+	const port = configService.get<string>('MONGODB_PORT');
 	const projectName = configService.get<string>('PROJECT_NAME');
 	const databaseName = configService.get<string>('MONGODB_DATABASE_NAME');
 	const databaseAuthName = configService.get<string>(
