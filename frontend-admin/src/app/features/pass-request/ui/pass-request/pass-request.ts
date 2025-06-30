@@ -4,7 +4,6 @@ import {
   DestroyRef,
   inject,
   input,
-  Input,
   OnInit,
   signal
 } from '@angular/core';

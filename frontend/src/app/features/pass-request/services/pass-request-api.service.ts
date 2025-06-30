@@ -2,13 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { PassRequest, PassRequestCreateDto } from '../models/interfaces';
 import { Observable } from 'rxjs';
+import { SseService } from '../../../shared/services/sse.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PassRequestApiService {
   constructor(
-		private readonly _http: HttpClient
+		private readonly _http: HttpClient,
+		private readonly _sseService: SseService
 	) { }
 
 	create(passRequestCreateDto: PassRequestCreateDto): Observable<PassRequest> {
@@ -17,5 +19,9 @@ export class PassRequestApiService {
 
 	get(): Observable<PassRequest> {
 		return this._http.get<PassRequest>('/api/pass-requests');
+	}
+
+	getSse(): Observable<PassRequest> {
+		return this._sseService.connect<PassRequest>('/api/pass-requests/sse');
 	}
 }

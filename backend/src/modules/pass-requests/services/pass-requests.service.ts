@@ -1,15 +1,15 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { PassRequests, PassRequestsDocument } from './pass-requests.schema';
 import { Model } from 'mongoose';
 import { AddField } from 'src/shared/utils/add-field';
-import { User } from '../user/user.schema';
-import { PassRequestCreateDto } from './model/dto/pass-request-create.dto';
-import { RequestUserDto } from '../auth/dto/request-user.dto';
-import { PassRequestStatusEnum } from './model/enum/pass-request-status.enum';
-import { PassRequestChangeStatusDto } from './model/dto/pass-request-change-status.dto';
-import { PassStatusDocument } from '../pass-statuses/pass-statuses.schema';
-import { PassStatusesService } from '../pass-statuses/pass-statuses.service';
+import { PassStatusesService } from 'src/modules/pass-statuses/pass-statuses.service';
+import { PassStatusDocument } from 'src/modules/pass-statuses/pass-statuses.schema';
+import { RequestUserDto } from 'src/modules/auth/dto/request-user.dto';
+import { User } from 'src/modules/user/user.schema';
+import { PassRequestChangeStatusDto } from '../model/dto/pass-request-change-status.dto';
+import { PassRequestCreateDto } from '../model/dto/pass-request-create.dto';
+import { PassRequestStatusEnum } from '../model/enum/pass-request-status.enum';
+import { PassRequests, PassRequestsDocument } from '../pass-requests.schema';
 
 @Injectable()
 export class PassRequestsService {
@@ -18,11 +18,9 @@ export class PassRequestsService {
 		private readonly _passStatusesService: PassStatusesService
   ) {}
 
-  async getById(req: RequestUserDto) {
-    const user = req.user as AddField<User, '_id', string>;
-
+  async getByUserId(userId: string): Promise<PassRequests | null> {
     return this._passRequestsModel
-      .findOne({ user: user._id })
+      .findOne({ user: userId })
       .populate({
         path: 'user',
         select: '-password -__v -createdAt -updatedAt -_id',
@@ -43,7 +41,7 @@ export class PassRequestsService {
 		req: RequestUserDto
 	): Promise<PassRequests> {
 		try {
-			const user = req.user as AddField<User, '_id', string>;
+			const user = req.user;
 
 			// Проверяем, есть ли уже заявка от этого пользователя
 			const existingRequest = await this._passRequestsModel.findOne({ user: user._id });
@@ -81,7 +79,7 @@ export class PassRequestsService {
 		{ status }: PassRequestChangeStatusDto,
 		req: RequestUserDto
 	) {
-		const user = req.user as AddField<User, '_id', string>;
+		const user = req.user;
 
 		if (user.role !== 'admin') {
 			throw new ForbiddenException('Нет прав на изменение статуса');

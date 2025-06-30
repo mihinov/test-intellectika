@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { PassRequestApiService } from './pass-request-api.service';
 import { Observable, startWith, Subject, switchMap, tap } from 'rxjs';
 import { PassRequest, PassRequestCreateDto } from '../models/interfaces';
+import { SseService } from '../../../shared/services/sse.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,13 +19,17 @@ export class PassRequestService {
   );
 
   constructor(
-    private readonly _passRequestApiService: PassRequestApiService
+    private readonly _passRequestApiService: PassRequestApiService,
   ) {}
 
   // Подписка на поток актуальных данных
   get(): Observable<PassRequest> {
     return this._passRequest$;
   }
+
+	getSse(): Observable<PassRequest> {
+		return this._passRequestApiService.getSse();
+	}
 
   // Метод создания с триггером обновления
   create(passRequestCreateDto: PassRequestCreateDto): Observable<PassRequest> {

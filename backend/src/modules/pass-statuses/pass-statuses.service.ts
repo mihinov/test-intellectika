@@ -45,4 +45,18 @@ export class PassStatusesService {
 
 		return this._passStatusModel.find({ $or: passStatuses }).exec();
 	}
+
+	async getById(id: string): Promise<PassStatusDocument | null> {
+		const status = await this._passStatusModel.findById(id).exec();
+
+		const deleteKeys = ['__v', 'createdAt', 'updatedAt', '_id'];
+
+		if (!status) {
+			return null;
+		}
+
+		deleteKeys.forEach((key) => delete status[key]);
+
+		return status;
+	}
 }

@@ -1,13 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
+// Подключение к MongoDb при локальной разработке с репликой работает только на порту MONGODB_PORT=27017
 function generateEnvFiles() {
   const envContent = `
 # MongoDB
 MONGODB_USER_NAME=admin
 MONGODB_USER_PASSWORD=password
 MONGODB_HOST=127.0.0.1
-MONGODB_PORT=29017
+MONGODB_PORT=27017
 MONGODB_DATABASE_NAME=intellectika-5
 MONGODB_DATABASE_AUTH_NAME=admin
 MONGODB_REPLICA_SET=rs0

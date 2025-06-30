@@ -3,7 +3,7 @@ import { HydratedDocument } from "mongoose";
 import { PlainMongoObject } from "src/shared/utils/lean-document";
 import { UserRole } from "./model/enum/user-role.enum";
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, collection: 'users' })
 export class User {
 
 	@Prop({ type: String, required: true, unique: true })
