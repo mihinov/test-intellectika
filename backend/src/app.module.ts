@@ -9,7 +9,6 @@ import { PassRequestsModule } from './modules/pass-requests/pass-requests.module
 import { BootstrapService } from './shared/services/bootstrap.service';
 import { PassStatusesModule } from './modules/pass-statuses/pass-statuses.module';
 import { getMongoConnectionString } from './config/mongodb.config';
-import { MongoChangeStreamService } from './shared/services/mongo-change-stream.service';
 
 const featureModules = [
   AuthModule,

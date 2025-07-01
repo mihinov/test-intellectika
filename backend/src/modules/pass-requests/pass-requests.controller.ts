@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { RequestUserDto } from '../auth/dto/request-user.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { PassRequestChangeStatusDto } from './model/dto/pass-request-change-status.dto';
-import { map, tap } from 'rxjs';
+import { map } from 'rxjs';
 import { PassRequestsService } from './services/pass-requests.service';
 import { PassRequestsStreamService } from './services/pass-requests-stream.service';
 
@@ -77,7 +77,6 @@ export class PassRequestsController {
 	@Sse('sse/all')
 	getAllSSE() {
 		return this._passRequestsStreamService.getAll().pipe(
-			//tap((data) => console.log('В потоке', data)),
 			map((data) => ({
         data: JSON.stringify(data), // Преобразуем данные в строку
       })),

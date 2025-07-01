@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
-import { Connection, ObjectId } from 'mongoose';
+import { Connection } from 'mongoose';
 import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable()
