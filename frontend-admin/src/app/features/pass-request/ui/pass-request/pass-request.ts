@@ -82,4 +82,14 @@ export class PassRequestComponent implements OnInit {
   toggleStatusHistory(): void {
     this.showStatusHistory.update((v) => !v);
   }
+
+	deletePassRequest(): void {
+		const confirmed = confirm('Вы уверены, что хотите удалить заявку?');
+		if (!confirmed) return;
+
+		this._passRequestService
+			.deleteById(this.passRequest()._id)
+			.pipe(takeUntilDestroyed(this._destroyRef), take(1))
+			.subscribe();
+	}
 }

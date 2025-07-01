@@ -22,7 +22,7 @@ export class PassRequestApiService {
 	}
 
 	getSse(): Observable<PassRequest | null> {
-		return this._sseService.connect<PassRequest | null>('/api/pass-requests/sse').pipe(
+		return this._sseService.connect<PassRequest | null>('/api/pass-requests/sse/by-user').pipe(
 			//tap(data => console.log('Данные в this._sseService.connect', data)), // Для отладки;
 		);
 	}

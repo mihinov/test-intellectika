@@ -10,28 +10,39 @@
       </span>
     </div>
 
-    @if (isEditingStatus) {
-      <form [formGroup]="form" class="status-edit">
-        <select class="select" formControlName="status">
-					@for (status of allStatuses; track status.type) {
-						<option [value]="status.type">{{ status.value }}</option>
-					}
-        </select>
-        <div>
-          <button class="btn btn_error" type="button" (click)="cancelStatusChange()">Отменить</button>
-          <button class="btn" type="button" (click)="confirmStatusChange()">Подтвердить</button>
-        </div>
-      </form>
-    } @else {
-      <span
-        class="status-click-edit"
-        [class]="passRequestData.status"
-        (click)="startStatusEdit()"
-        title="Кликните, чтобы изменить статус"
-      >
-        Изменить статус
-      </span>
-    }
+		<div class="pass-request-card__second-line">
+			@if (isEditingStatus) {
+				<form [formGroup]="form" class="status-edit">
+					<select class="select" formControlName="status">
+						@for (status of allStatuses; track status.type) {
+							<option [value]="status.type">{{ status.value }}</option>
+						}
+					</select>
+					<div>
+						<button class="btn btn_error" type="button" (click)="cancelStatusChange()">Отменить</button>
+						<button class="btn" type="button" (click)="confirmStatusChange()">Подтвердить</button>
+					</div>
+				</form>
+			} @else {
+				<span
+					class="status-click-edit"
+					[class]="passRequestData.status"
+					(click)="startStatusEdit()"
+					title="Кликните, чтобы изменить статус"
+				>
+					Изменить статус
+				</span>
+			}
+
+			<button
+				class="btn btn_error"
+				type="button"
+				(click)="deletePassRequest()"
+				title="Удалить заявку"
+			>
+				Удалить заявку
+			</button>
+		</div>
   </header>
 
 	<div class="user-list-info">

@@ -15,5 +15,5 @@ import { PassRequestComponent } from '../pass-request/pass-request';
 })
 export class PassRequestList {
   private readonly _passRequestService = inject(PassRequestService);
-  protected readonly passRequests$ = this._passRequestService.getAll();
+  protected readonly passRequests$ = this._passRequestService.getAllSse();
 }

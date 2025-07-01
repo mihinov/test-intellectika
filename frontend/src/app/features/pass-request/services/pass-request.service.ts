@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { PassRequestApiService } from './pass-request-api.service';
-import { EMPTY, Observable, shareReplay, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, shareReplay, switchMap } from 'rxjs';
 import { PassRequest, PassRequestCreateDto } from '../models/interfaces';
 import { AuthService } from '../../auth/services/auth.service';
 

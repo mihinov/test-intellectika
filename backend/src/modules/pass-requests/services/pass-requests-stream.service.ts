@@ -3,13 +3,11 @@ import { MongoChangeStreamService } from "src/shared/services/mongo-change-strea
 import { PassRequests } from "../pass-requests.schema";
 import { UserService } from "src/modules/user/user.service";
 import { PassStatusesService } from "src/modules/pass-statuses/pass-statuses.service";
-import { catchError, filter, from, merge, Observable, of, race, share, skip, startWith, switchMap, take, timeout } from "rxjs";
+import { filter, from, merge, Observable, of, share, switchMap } from "rxjs";
 import { PassRequestsService } from "./pass-requests.service";
 
 @Injectable()
 export class PassRequestsStreamService {
-	private _isFirstRequest: boolean = true; // Флаг для отслеживания первого запроса
-
 	constructor(
 		private readonly _mongoChangeStreamService: MongoChangeStreamService,
 		private readonly _userService: UserService,
@@ -67,6 +65,19 @@ export class PassRequestsStreamService {
 				merge(
 					of(data),
 					changeStream$
+				)
+			)
+		);
+	}
+
+	getAll(): Observable<PassRequests[]> {
+		return from(this._passRequestsService.getAll()).pipe(
+			switchMap(initialData =>
+				merge(
+					of(initialData),
+					this._watch().pipe(
+						switchMap(() => from(this._passRequestsService.getAll()))
+					)
 				)
 			)
 		);

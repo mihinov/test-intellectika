@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards, Request, Patch, Param, Sse } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Request, Patch, Param, Sse, Delete } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { PassRequestCreateDto } from './model/dto/pass-request-create.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
@@ -53,11 +53,31 @@ export class PassRequestsController {
 	}
 
 	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard, AdminGuard)
+	@Delete(':id')
+	deleteById(
+		@Param('id') id: string
+	) {
+		return this._passRequestsService.deleteById(id);
+	}
+
+	@ApiBearerAuth()
 	@UseGuards(JwtAuthGuard)
-	@Sse('sse')
+	@Sse('sse/by-user')
 	getSSE(@Request() req: RequestUserDto) {
 		return this._passRequestsStreamService.getByUserId(req.user._id.toString()).pipe(
-			tap((data) => console.log('В потоке', data)),
+			map((data) => ({
+        data: JSON.stringify(data), // Преобразуем данные в строку
+      })),
+		)
+	}
+
+	@ApiBearerAuth()
+	@UseGuards(JwtAuthGuard, AdminGuard)
+	@Sse('sse/all')
+	getAllSSE() {
+		return this._passRequestsStreamService.getAll().pipe(
+			//tap((data) => console.log('В потоке', data)),
 			map((data) => ({
         data: JSON.stringify(data), // Преобразуем данные в строку
       })),

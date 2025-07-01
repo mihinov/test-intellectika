@@ -1,40 +1,43 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, switchMap, tap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { EMPTY, Observable, shareReplay, switchMap } from 'rxjs';
 import { PassRequestApiService } from './pass-request-api.service';
 import { ChangeStatusRequest, PassRequest } from '../model/interfaces';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PassRequestService {
-  private readonly _refreshTrigger$$ = new BehaviorSubject<void>(undefined);
-
-  readonly all$: Observable<PassRequest[]> = this._refreshTrigger$$.pipe(
-    switchMap(() => this._passRequestApiService.getAll())
-  );
-
-  constructor(
-    private readonly _passRequestApiService: PassRequestApiService
-  ) { }
+	private readonly _authService = inject(AuthService);
+	private readonly _isAuth$ = this._authService.isAuth$;
+	private readonly _passRequestApiService = inject(PassRequestApiService);
+	private readonly _sseAllCached$ = this._isAuth$.pipe(
+		switchMap(isAuth => {
+    	return isAuth
+				? this._passRequestApiService.getAllSse()
+				: EMPTY;
+  	}),
+		shareReplay(1)
+	);
 
 
   getAll(): Observable<PassRequest[]> {
-    return this.all$;
+    return this._passRequestApiService.getAll();
   }
+
+	getAllSse(): Observable<PassRequest[]> {
+		return this._sseAllCached$;
+	}
+
+	deleteById(id: string): Observable<PassRequest> {
+		return this._passRequestApiService.deleteById(id);
+	}
 
   /**
    * Изменение статуса запроса и обновление списка
    */
   changeStatusRequest(changeStatusRequest: ChangeStatusRequest): Observable<PassRequest> {
-    return this._passRequestApiService.changeStatusRequest(changeStatusRequest).pipe(
-      tap(() => this.refresh())
-    );
+    return this._passRequestApiService.changeStatusRequest(changeStatusRequest);
   }
 
-  /**
-   * Принудительное обновление
-   */
-  refresh(): void {
-    this._refreshTrigger$$.next();
-  }
 }

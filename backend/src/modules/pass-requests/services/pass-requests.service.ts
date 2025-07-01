@@ -1,11 +1,9 @@
 import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AddField } from 'src/shared/utils/add-field';
 import { PassStatusesService } from 'src/modules/pass-statuses/pass-statuses.service';
 import { PassStatusDocument } from 'src/modules/pass-statuses/pass-statuses.schema';
 import { RequestUserDto } from 'src/modules/auth/dto/request-user.dto';
-import { User } from 'src/modules/user/user.schema';
 import { PassRequestChangeStatusDto } from '../model/dto/pass-request-change-status.dto';
 import { PassRequestCreateDto } from '../model/dto/pass-request-create.dto';
 import { PassRequestStatusEnum } from '../model/enum/pass-request-status.enum';
@@ -136,5 +134,9 @@ export class PassRequestsService {
 				select: '-__v -createdAt -updatedAt',
 			})
 			.exec();
+	}
+
+	async deleteById(id: string): Promise<PassRequests | null> {
+		return this._passRequestsModel.findByIdAndDelete(id).exec();
 	}
 }
