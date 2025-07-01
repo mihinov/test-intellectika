@@ -60,6 +60,6 @@ export class AuthController {
   async loginAdmin(
 		@Body() authLoginEmailPasswordDto: AuthLoginEmailPasswordDto
 	) {
-		return this._authService.loginEmailPassword(authLoginEmailPasswordDto);
+		return this._authService.loginEmailPasswordAdmin(authLoginEmailPasswordDto);
   }
 }

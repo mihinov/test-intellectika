@@ -27,9 +27,7 @@ export class AuthService {
    */
   login(authLogin: AuthLogin) {
     return this._authApiService.login(authLogin).pipe(
-      tap(({ access_token }) => {
-        this._setToken(access_token);
-      })
+      tap(({ access_token }) => this._setToken(access_token))
     );
   }
 
