@@ -2,7 +2,7 @@
 
 ## Используемые технологии:
 
-![My Skills](https://skillicons.dev/icons?i=nodejs,nestjs,mongodb,angular)
+![My Skills](https://skillicons.dev/icons?i=nodejs,nestjs,mongodb,angular,docker)
 
 ## Описание проекта
 
