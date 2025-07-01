@@ -3,7 +3,7 @@ import { MongoChangeStreamService } from "src/shared/services/mongo-change-strea
 import { PassRequests } from "../pass-requests.schema";
 import { UserService } from "src/modules/user/user.service";
 import { PassStatusesService } from "src/modules/pass-statuses/pass-statuses.service";
-import { filter, from, merge, Observable, of, race, skip, startWith, switchMap, take, timeout } from "rxjs";
+import { catchError, filter, from, merge, Observable, of, race, share, skip, startWith, switchMap, take, timeout } from "rxjs";
 import { PassRequestsService } from "./pass-requests.service";
 
 @Injectable()
@@ -52,23 +52,23 @@ export class PassRequestsStreamService {
 
 	getByUserId(userId: string): Observable<PassRequests | null> {
 		const changeStream$ = this._watch().pipe(
-			filter((passRequest: PassRequests) => passRequest.user._id.toString() === userId)
+			filter((passRequest: PassRequests | null) => {
+				// Если null — значит удаление, пропускаем в поток
+				if (passRequest === null) return true;
+
+				// Фильтруем только документы текущего пользователя
+				return passRequest.user._id.toString() === userId;
+			}),
+			share()
 		);
 
-		// Даем changeStream$ возможность прислать первое обновление в течение некоторого времени
-		// Если ничего не пришло — fallback с обычного сервиса
-		return changeStream$.pipe(
-			startWith(null), // ничего не пришло — будет fallback
-			take(1),
-			switchMap(initial => {
-				if (initial === null) {
-					return from(this._passRequestsService.getByUserId(userId)).pipe(
-						switchMap(data => merge(of(data), changeStream$))
-					);
-				}
-
-				return merge(of(initial), changeStream$.pipe(skip(1)));
-			})
+		return from(this._passRequestsService.getByUserId(userId)).pipe(
+			switchMap(data =>
+				merge(
+					of(data),
+					changeStream$
+				)
+			)
 		);
 	}
 }

@@ -1,44 +1,35 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { PassRequestApiService } from './pass-request-api.service';
-import { Observable, startWith, Subject, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, shareReplay, switchMap, tap } from 'rxjs';
 import { PassRequest, PassRequestCreateDto } from '../models/interfaces';
-import { SseService } from '../../../shared/services/sse.service';
+import { AuthService } from '../../auth/services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PassRequestService {
-  // Триггер для перезапроса данных
-  private readonly _refreshTrigger$$ = new Subject<void>();
+	private readonly _authService = inject(AuthService);
+	private readonly _isAuth$ = this._authService.isAuth$;
+	private readonly _passRequestApiService = inject(PassRequestApiService);
+	private readonly _sseCached$ = this._isAuth$.pipe(
+		switchMap(isAuth => {
+    	return isAuth
+				? this._passRequestApiService.getSse()
+				: EMPTY;
+  	}),
+		shareReplay(1)
+	);
 
-  // Поток с актуальными данными
-  private readonly _passRequest$: Observable<PassRequest> = this._refreshTrigger$$.pipe(
-    // при каждом новом триггере запрашиваем данные
-    startWith(0), // запускаем сразу при первой подписке
-    switchMap(() => this._passRequestApiService.get())
-  );
-
-  constructor(
-    private readonly _passRequestApiService: PassRequestApiService,
-  ) {}
-
-  // Подписка на поток актуальных данных
-  get(): Observable<PassRequest> {
-    return this._passRequest$;
+  get(): Observable<PassRequest | null> {
+    return this._passRequestApiService.get();
   }
 
-	getSse(): Observable<PassRequest> {
-		return this._passRequestApiService.getSse();
+	getSse(): Observable<PassRequest | null> {
+		return this._sseCached$;
 	}
 
   // Метод создания с триггером обновления
   create(passRequestCreateDto: PassRequestCreateDto): Observable<PassRequest> {
-		return this._passRequestApiService.create(passRequestCreateDto).pipe(
-			tap(() => this._refreshTrigger$$.next()) // корректный побочный эффект
-		);
+		return this._passRequestApiService.create(passRequestCreateDto);
   }
-
-	refresh(): void {
-		this._refreshTrigger$$.next();
-	}
 }

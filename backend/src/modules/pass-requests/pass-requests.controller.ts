@@ -57,7 +57,7 @@ export class PassRequestsController {
 	@Sse('sse')
 	getSSE(@Request() req: RequestUserDto) {
 		return this._passRequestsStreamService.getByUserId(req.user._id.toString()).pipe(
-			//tap((data) => console.log('В потоке', data)),
+			tap((data) => console.log('В потоке', data)),
 			map((data) => ({
         data: JSON.stringify(data), // Преобразуем данные в строку
       })),

@@ -10,10 +10,12 @@ import { LocalStorageService } from './local-storage.service';
 })
 export class SseService {
   private _eventSource: CustomEventSource | null = null;
-  private readonly _timeoutThreshold = 60000; // время переподключения в мс, если не приходят новые данные
-  private _lastDataReceivedTime: number | null = null;
-  private _retryTimeout: any;
   private _url: string | null = null;
+  private _retryTimeout: any;
+  private _lastDataReceivedTime: number | null = null;
+
+  // 🔁 Единый интервал ожидания: и для ошибок, и для "тишины"
+  private readonly _reconnectInterval = 500_000;
 
   private _dataSubject = new Subject<any>();
   public data$ = this._dataSubject.asObservable();
@@ -24,70 +26,85 @@ export class SseService {
     private readonly _localStorageService: LocalStorageService
   ) {}
 
-  private _resetRetryTimeout(): void {
-    if (this._retryTimeout) {
-      clearTimeout(this._retryTimeout);
-    }
-
-    this._retryTimeout = setTimeout(() => {
-      if (this._lastDataReceivedTime && Date.now() - this._lastDataReceivedTime > this._timeoutThreshold) {
-        console.log('No data received in time, reconnecting...');
-        this._retryConnection();
-      }
-    }, this._timeoutThreshold);
-  }
-
-  private _retryConnection(): void {
-    if (this._eventSource) {
-      console.log('Closing previous SSE connection and reopening...');
-      this._eventSource.close();
-      this._eventSource = null;
-    }
-
-    if (this._url) {
-      this._openSseConnection(this._url);
-    } else {
-      console.warn('No URL stored for reconnecting');
-    }
-  }
-
-  private _openSseConnection(url: string): void {
-    this._url = url;
-    const token = this._localStorageService.getItem(AuthService.LOCAL_STORAGE_KEY);
-    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-
-    console.log(`Attempting to connect to SSE at ${url} with token: ${token ? 'present' : 'not present'}`);
-
-    if (this._eventSource) {
-      console.log('Closing previous SSE connection...');
-      this._eventSource.close();
-    }
-
-    this._eventSource = new CustomEventSource(url, headers);
-    this._eventSource.open();
-
-    this._eventSource.onmessage = (event) => {
-      console.log('Received SSE message:', event.data);
-      this._zone.run(() => {
-        this._dataSubject.next(event.data);
-      });
-      this._lastDataReceivedTime = Date.now();
-      this._resetRetryTimeout();
-    };
-  }
-
-  public connect<T>(url: string): Observable<T> {
+  connect<T>(url: string): Observable<T> {
     console.log(`Starting SSE connection to: ${url}`);
-    this._resetRetryTimeout();
-    this._openSseConnection(url);
+    this._url = url;
+    this._lastDataReceivedTime = Date.now();
+    this._connect();
     return this.data$;
   }
 
-  public disconnect(): void {
+  private _connect(): void {
+    if (!this._url) {
+      console.warn('No URL available for SSE connection');
+      return;
+    }
+
+    const token = this._localStorageService.getItem(AuthService.LOCAL_STORAGE_KEY);
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+
     if (this._eventSource) {
       this._eventSource.close();
       this._eventSource = null;
     }
-    this._dataSubject.complete();
+
+    this._eventSource = new CustomEventSource(this._url, headers);
+    this._eventSource.open();
+
+    this._eventSource.onmessage = (event) => {
+      this._zone.run(() => {
+        this._dataSubject.next(event.data);
+      });
+
+      this._lastDataReceivedTime = Date.now();
+      this._scheduleInactivityCheck(); // перезапускаем таймер
+    };
+
+    this._eventSource.onerror = (error) => {
+      console.error('SSE connection error:', error);
+			this._toastService.show(`${error.status} ${error.body?.message || error.statusText} ${error.body?.path}`, 'error');
+      this._scheduleReconnect();
+    };
+
+    this._scheduleInactivityCheck(); // первый запуск
+  }
+
+  private _scheduleReconnect(): void {
+    if (this._eventSource) {
+      this._eventSource.close();
+      this._eventSource = null;
+    }
+
+    clearTimeout(this._retryTimeout);
+    console.warn(`Retrying SSE connection in ${this._reconnectInterval} ms...`);
+
+    this._retryTimeout = setTimeout(() => {
+      this._connect();
+    }, this._reconnectInterval);
+  }
+
+  private _scheduleInactivityCheck(): void {
+    clearTimeout(this._retryTimeout);
+    this._retryTimeout = setTimeout(() => {
+      if (
+        this._lastDataReceivedTime &&
+        Date.now() - this._lastDataReceivedTime > this._reconnectInterval
+      ) {
+        console.warn('No SSE data received in time. Reconnecting...');
+        this._scheduleReconnect();
+      } else {
+        this._scheduleInactivityCheck(); // ждём дальше
+      }
+    }, this._reconnectInterval + 100); // небольшой запас
+  }
+
+  disconnect(): void {
+		//console.log(`Closing SSE connection to: ${this._url}`);
+    if (this._eventSource) {
+      this._eventSource.close();
+      this._eventSource = null;
+    }
+    clearTimeout(this._retryTimeout);
+    this._dataSubject.next(null);
   }
 }

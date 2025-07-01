@@ -1,30 +1,30 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
-import { Connection } from 'mongoose';
+import { Connection, ObjectId } from 'mongoose';
 import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable()
 export class MongoChangeStreamService {
-  private _streams = new Map<string, ReplaySubject<any>>(); // Потоки изменений для каждой коллекции
+  private _streams = new Map<string, ReplaySubject<any>>();
 
   constructor(@InjectConnection() private readonly _connection: Connection) {}
 
   watchCollection<TSchema extends Record<string, any> = any>(
     collectionName: string,
-    populateHandler?: (doc: TSchema) => Promise<TSchema>, // необязательный колбэк
-  ): Observable<TSchema> {
+    populateHandler?: (doc: TSchema) => Promise<TSchema>,
+  ): Observable<TSchema | null> {
     console.log(`watchCollection: Начинаю наблюдение за коллекцией ${collectionName}`);
 
-    const existing = this._streams.get(collectionName) as ReplaySubject<TSchema> | undefined;
+    const existing = this._streams.get(collectionName);
     if (existing) {
-      console.log(`watchCollection: Для коллекции ${collectionName} уже существует поток изменений. Возвращаю существующий.`);
+      console.log(`watchCollection: Поток для ${collectionName} уже существует. Возвращаю.`);
       return existing.asObservable();
     }
 
-    const subject = new ReplaySubject<TSchema>(1); // Задаём размер буфера 1
+    const subject = new ReplaySubject<TSchema | null>(1);
     this._streams.set(collectionName, subject);
-    console.log(`watchCollection: Создаю новый поток изменений для коллекции ${collectionName}`);
+    console.log(`watchCollection: Создаю новый поток для ${collectionName}`);
 
     const collection = this._connection.collection<TSchema>(collectionName);
 
@@ -33,33 +33,36 @@ export class MongoChangeStreamService {
     });
 
     changeStream.on('change', async (change) => {
-      console.log(`watchCollection: Изменение в коллекции ${collectionName}:`, change);
+      console.log(`watchCollection: Изменение в ${collectionName}:`, change);
 
-      if (hasFullDocument(change)) {
-        console.log(`watchCollection: Полный документ найден.`);
+      try {
+        if (change.operationType === 'delete') {
+          console.log(`watchCollection: Удалён документ. Отправляю null`);
+          subject.next(null);
+        } else if (hasFullDocument<TSchema>(change)) {
+          console.log(`watchCollection: Найден полный документ`);
 
-        // Если передан обработчик, вызываем его для подгрузки данных
-        if (populateHandler) {
-          const populatedDocument = await populateHandler(change.fullDocument);
-          console.log(`watchCollection: Документ с подгруженными данными:`, populatedDocument);
-          subject.next(populatedDocument); // Прокидываем данные в поток
+          const populated = populateHandler
+            ? await populateHandler(change.fullDocument)
+            : change.fullDocument;
+
+          subject.next(populated);
         } else {
-          console.log(`watchCollection: Обработчик не передан, отправляю документ как есть.`);
-          subject.next(change.fullDocument); // Прокидываем данные без изменений
+          console.log(`watchCollection: Полный документ отсутствует — пропускаю`);
         }
-      } else {
-        console.log(`watchCollection: Полный документ не найден. Пропускаю изменения.`);
+      } catch (err) {
+        console.error(`watchCollection: Ошибка обработки:`, err);
       }
     });
 
     changeStream.on('error', (err) => {
-      console.error(`watchCollection: Ошибка при наблюдении за коллекцией ${collectionName}:`, err);
+      console.error(`watchCollection: Ошибка наблюдения за ${collectionName}:`, err);
       subject.error(err);
       this._streams.delete(collectionName);
     });
 
     changeStream.on('close', () => {
-      console.log(`watchCollection: Поток для коллекции ${collectionName} закрыт.`);
+      console.log(`watchCollection: Поток закрыт для ${collectionName}`);
       subject.complete();
       this._streams.delete(collectionName);
     });
@@ -68,8 +71,6 @@ export class MongoChangeStreamService {
   }
 }
 
-function hasFullDocument<T>(
-  change: any,
-): change is { fullDocument: T } {
+function hasFullDocument<T>(change: any): change is { fullDocument: T } {
   return 'fullDocument' in change && change.fullDocument !== undefined;
 }
