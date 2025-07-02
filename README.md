@@ -61,10 +61,10 @@
 
 Выборочно запустить:
 
-- `npm run start` Чтобы запустить бекенд и два фронта
-- `npm run start:backend` - Запустить бекенд
-- `npm run start:frontend` - Запустить фронтенд для пользователей
-- `npm run start:frontend-admin` - Запустить фронтенд для админов
+- `npm run start` - бекенд и два фронта
+- `npm run start:backend` - бекенд
+- `npm run start:frontend` - фронтенд для пользователей
+- `npm run start:frontend-admin` - фронтенд для админов
 	 
 ## Автоматизация
 
