@@ -55,8 +55,9 @@
 
 ## Запуск в режиме разработки:
 
-1. Запустить `npm install`
-2. Запустить `npm run docker:db`
+1. Запустить `npm run create-env`
+2. Запустить `npm install`
+3. Запустить `npm run docker:db`
 
 Выборочно запустить:
 
