@@ -13,11 +13,12 @@ import { getMongoConnectionString } from './config/mongodb.config';
 const featureModules = [
   AuthModule,
   UserModule,
+	PassRequestsModule,
+	PassStatusesModule
 ];
 
 @Module({
 	imports: [
-		...featureModules,
 		ConfigModule.forRoot({
 			isGlobal: true,
 			envFilePath: '.env'
@@ -34,8 +35,7 @@ const featureModules = [
 				defaultValidationOptions: getConfigJoi()
 			}
 		}),
-		PassRequestsModule,
-		PassStatusesModule,
+		...featureModules,
 	],
 	controllers: [],
 	providers: [
