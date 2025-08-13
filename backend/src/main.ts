@@ -30,7 +30,7 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(port, () => {
-    void analyzeRoutes();
+    void analyzeRoutes(app);
     console.log(`\n🚀 Сервер запущен: http://localhost:${port}`);
     console.log(`📘 Swagger: http://localhost:${port}/docs`);
   });
